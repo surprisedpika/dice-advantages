@@ -1,17 +1,16 @@
 type Part = { probability: number; value: number };
-type Expression = Part[];
 
 function dN(n: number): Part[] {
   return Array.from({ length: n }, (_, i) => ({ probability: 1 / n, value: i + 1 }));
 }
 
-function product(lists: Part[][]): Expression[] {
+function product(lists: Part[][]): Part[][] {
   if (lists.length === 0) return [];
 
-  let res: Expression[] = lists[0].map((el) => [el]);
+  let res: Part[][] = lists[0].map((el) => [el]);
 
   for (let i = 1; i < lists.length; i++) {
-    const tmp: Expression[] = [];
+    const tmp: Part[][] = [];
     for (const r of res) {
       for (const el of lists[i]) {
         tmp.push([...r, el]);
@@ -22,7 +21,7 @@ function product(lists: Part[][]): Expression[] {
   return res;
 }
 
-function psum(exps: Expression[]): Expression {
+function psum(exps: Part[][]): Part[] {
   const tmp: Record<number, number> = {};
 
   for (const exp of exps) {
@@ -38,7 +37,7 @@ function psum(exps: Expression[]): Expression {
     tmp[count] += prob;
   }
 
-  const out: Expression = [];
+  const out: Part[] = [];
   let total = 0;
   for (const [countStr, prob] of Object.entries(tmp)) {
     const count = parseInt(countStr);
@@ -53,8 +52,8 @@ function psum(exps: Expression[]): Expression {
   return out;
 }
 
-function highest(exps: Expression[], N: number): Expression[] {
-  const out: Expression[] = [];
+function highest(exps: Part[][], N: number): Part[][] {
+  const out: Part[][] = [];
   for (const exp of exps) {
     let tmp: Part[] = [];
     for (const part of exp) {
@@ -72,14 +71,15 @@ function highest(exps: Expression[], N: number): Expression[] {
   return out;
 }
 
-function highest_new(exps: Expression[], N: number): Expression[] {
+function highest_new(exps: Part[][], N: number): Part[][] {
+
   throw new Error();
 }
 
 function parse(
   txt: string,
   sumResult: boolean = false
-): Expression[] | Expression {
+): Part[][] | Part[] {
   let value = 0,
     count = 0,
     die = 0;
@@ -103,7 +103,7 @@ function parse(
 }
 
 const xdykhz = (x: number, y: number, z: number) => {
-  let out = parse(`${x}d${y}`) as Expression[];
+  let out = parse(`${x}d${y}`) as Part[][];
   const dist = psum(highest(out, z));
   return dist.reduce((partialSum, exp) => partialSum + exp.value * exp.probability, 0); // Calculate mean
 };
