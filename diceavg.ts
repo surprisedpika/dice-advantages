@@ -46,34 +46,44 @@ function psum(exps: Part[][]): Part[] {
   return result;
 }
 
-function highest(expressions: Part[][], N: number, advantage: boolean = true): Part[][] {
+function highest(
+  expressions: Part[][],
+  numToKeep: number,
+  advantage: boolean
+): Part[][] {
   const result: Part[][] = [];
   for (const expression of expressions) {
-    const temp: Part[] = expression.slice(0, N);
+    const temp: Part[] = expression.slice(0, numToKeep);
     temp.sort((a, b) => a.value - b.value);
-    for (let i = N; i < expression.length; i++) {
-      if (advantage) {
-        if (expression[i].value > temp[0].value) temp[0] = expression[i];
-      } else {
-        if (expression[i].value < temp[0].value) temp[0] = expression[i];
-      }
+    for (let i = numToKeep; i < expression.length; i++) {
+      if (
+        advantage
+          ? expression[i].value > temp[0].value
+          : expression[i].value < temp[0].value
+      )
+        temp[0] = expression[i];
     }
     result.push(temp);
   }
   return result;
 }
 
-const advantage_mean = (x: number, y: number, z: number, advantage: boolean = true) => {
+const advantage_mean = (
+  numDice: number,
+  sides: number,
+  numToKeep: number,
+  advantage: boolean
+) => {
   // Generate individual rolls
-  const row = Array.from({ length: y }, (_, i) => ({
-    probability: 1 / y,
+  const row = Array.from({ length: sides }, (_, i) => ({
+    probability: 1 / sides,
     value: i + 1,
   }));
-  const roll = Array.from({ length: x }, () => [...row]);
+  const roll = Array.from({ length: numDice }, () => [...row]);
   // Generate all combinations
   const out = product(roll);
   // Generate distribution
-  const dist = psum(highest(out, z, advantage));
+  const dist = psum(highest(out, numToKeep, advantage));
   // Calculate mean
   return dist.reduce(
     (partialSum, exp) => partialSum + exp.value * exp.probability,
@@ -81,6 +91,6 @@ const advantage_mean = (x: number, y: number, z: number, advantage: boolean = tr
   );
 };
 
-console.log(advantage_mean(2, 20, 1)); // 13.825
+console.log(advantage_mean(2, 20, 1, true)); // 13.825
 console.log(advantage_mean(2, 20, 1, false)); // 7.175
-console.log(advantage_mean(4, 6, 3)); // 12.2445987654321
+console.log(advantage_mean(4, 6, 3, true)); // 12.2445987654321
