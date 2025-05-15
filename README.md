@@ -1,1 +1,2 @@
 Calculates average of rolling x dice with y sides, keeping the highest (or lowest) z, using brute-force algorithm.
+Original code written in Python by @savage13, then translated to TS and optimised by me.
