@@ -1,24 +1,23 @@
-type Part = { probability: number; value: number };
+interface Part { probability: number; value: number };
 
-function dN(n: number): Part[] {
-  return Array.from({ length: n }, (_, i) => ({ probability: 1 / n, value: i + 1 }));
-}
+const dN = (n: number) =>
+  Array.from({ length: n }, (_, i) => ({ probability: 1 / n, value: i + 1 }));
 
 function product(lists: Part[][]): Part[][] {
   if (lists.length === 0) return [];
-
-  let res: Part[][] = lists[0].map((el) => [el]);
+  let result: Part[][] = lists[0].map((el) => [el]);
 
   for (let i = 1; i < lists.length; i++) {
-    const tmp: Part[][] = [];
-    for (const r of res) {
+    const temp: Part[][] = [];
+    for (const res of result) {
       for (const element of lists[i]) {
-        tmp.push([...r, element]);
+        temp.push([...res, element]);
       }
     }
-    res = tmp;
+    result = temp;
   }
-  return res;
+
+  return result;
 }
 
 function psum(exps: Part[][]): Part[] {
@@ -26,7 +25,7 @@ function psum(exps: Part[][]): Part[] {
 
   for (const exp of exps) {
     let count = 0;
-    let prob = 1.0;
+    let prob = 1;
     for (const part of exp) {
       count += part.value;
       prob *= part.probability;
@@ -39,16 +38,13 @@ function psum(exps: Part[][]): Part[] {
 
   const out: Part[] = [];
   let total = 0;
-  for (const [countStr, prob] of Object.entries(temp)) {
-    const count = parseInt(countStr);
-    out.push({ value: count, probability: prob });
+
+  for (const [count, prob] of Object.entries(temp)) {
+    out.push({ value: Number(count), probability: prob });
     total += prob;
   }
 
-  for (const q of out) {
-    q.probability /= total;
-  }
-
+  out.forEach((q) => q.probability /= total);
   return out;
 }
 
@@ -72,11 +68,18 @@ function highest(exps: Part[][], N: number): Part[][] {
 }
 
 const xdykhz = (x: number, y: number, z: number) => {
+  // Generate individual rolls
   const roll = Array.from({ length: x >= 1 ? x : 1 }, () => dN(y));
+  // Generate all combinations
   const out = product(roll);
+  // Generate distribution
   const dist = psum(highest(out, z));
-  return dist.reduce((partialSum, exp) => partialSum + exp.value * exp.probability, 0); // Calculate mean
+  // Calculate mean
+  return dist.reduce(
+    (partialSum, exp) => partialSum + exp.value * exp.probability,
+    0
+  );
 };
 
-console.log(xdykhz(2, 20, 1));
-console.log(xdykhz(4, 6, 3));
+console.log(xdykhz(2, 20, 1)); // 13.825
+console.log(xdykhz(4, 6, 3)); // 12.2445987654321
