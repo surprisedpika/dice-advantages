@@ -51,16 +51,10 @@ function psum(exps: Part[][]): Part[] {
 function highest(exps: Part[][], N: number): Part[][] {
   const out: Part[][] = [];
   for (const exp of exps) {
-    let temp: Part[] = [];
-    for (const part of exp) {
-      if (temp.length < N) {
-        temp.push(part);
-        if (temp.length === N) {
-          temp.sort((a, b) => a.value - b.value);
-        }
-      } else if (part.value > temp[0].value) {
-        temp[0] = part;
-      }
+    let temp: Part[] = exp.slice(0, N);
+    temp.sort((a, b) => a.value - b.value);
+    for (let i = N; i < exp.length; i++) {
+      if (exp[i].value > temp[0].value) temp[0] = exp[i];
     }
     out.push(temp);
   }
@@ -84,11 +78,6 @@ const xdykhz = (x: number, y: number, z: number) => {
     0
   );
 };
-
-// 180ms
-console.time();
-for (let i = 0; i < 5_000; i++) xdykhz(2, 20, 1);
-console.timeEnd();
 
 console.log(xdykhz(2, 20, 1)); // 13.825
 console.log(xdykhz(4, 6, 3)); // 12.2445987654321
