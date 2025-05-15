@@ -71,34 +71,9 @@ function highest(exps: Part[][], N: number): Part[][] {
   return out;
 }
 
-function parse(
-  text: string,
-  sumResult: boolean = false
-): Part[][] | Part[] {
-  let value = 0,
-    count = 0,
-    die = 0;
-  text = text.trim();
-
-  for (const c of text) {
-    if (c >= "0" && c <= "9") {
-      value = parseInt(c) + 10 * value;
-    } else if (c === "d") {
-      count = value;
-      value = 0;
-    }
-  }
-  die = value;
-  if (count === 0) count = 1;
-
-  const roll = Array.from({ length: count }, () => dN(die));
-  const out = product(roll);
-  if (sumResult) return psum(out);
-  return out;
-}
-
 const xdykhz = (x: number, y: number, z: number) => {
-  let out = parse(`${x}d${y}`) as Part[][];
+  const roll = Array.from({ length: x >= 1 ? x : 1 }, () => dN(y));
+  const out = product(roll);
   const dist = psum(highest(out, z));
   return dist.reduce((partialSum, exp) => partialSum + exp.value * exp.probability, 0); // Calculate mean
 };
