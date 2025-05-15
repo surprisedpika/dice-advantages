@@ -3,30 +3,28 @@ interface Part {
   value: number;
 }
 
-function psum(exps: Part[][]): Part[] {
-  const temp: Record<number, number> = {};
+const probabilityDistSummedValues = (exps: Part[][]) => {
+  const totals = new Map<number, number>();
 
   for (const exp of exps) {
-    let count = 0;
-    let prob = 1;
-    for (const part of exp) {
-      count += part.value;
-      prob *= part.probability;
-    }
-    if (!(count in temp)) temp[count] = 0;
-    temp[count] += prob;
+    const sum = exp.reduce(
+      (acc, part) => {
+        acc.value += part.value;
+        acc.probability *= part.probability;
+        return acc;
+      },
+      { value: 0, probability: 1 }
+    );
+
+    totals.set(sum.value, (totals.get(sum.value) || 0) + sum.probability);
   }
 
-  const result: Part[] = [];
-  let total = 0;
+  const totalProb = Array.from(totals.values()).reduce((a, b) => a + b, 0);
 
-  for (const [count, prob] of Object.entries(temp)) {
-    result.push({ value: Number(count), probability: prob });
-    total += prob;
-  }
-
-  result.forEach((q) => (q.probability /= total));
-  return result;
+  return Array.from(totals.entries()).map(([value, prob]) => ({
+    value,
+    probability: prob / totalProb,
+  }));
 }
 
 function highest(
@@ -69,7 +67,7 @@ const advantage_mean = (
     [[]]
   );
   // Generate distribution
-  const dist = psum(highest(out, numToKeep, advantage));
+  const dist = probabilityDistSummedValues(highest(out, numToKeep, advantage));
   // Calculate mean
   return dist.reduce(
     (partialSum, exp) => partialSum + exp.value * exp.probability,
