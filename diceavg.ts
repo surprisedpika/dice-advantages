@@ -25,13 +25,13 @@ const probabilityDistSummedValues = (exps: Part[][]) => {
     value,
     probability: prob / totalProb,
   }));
-}
+};
 
-function highest(
+const highest = (
   expressions: Part[][],
   numToKeep: number,
   advantage: boolean
-): Part[][] {
+) => {
   const result: Part[][] = [];
   for (const expression of expressions) {
     const temp: Part[] = expression.slice(0, numToKeep);
@@ -78,3 +78,5 @@ const advantage_mean = (
 console.log(advantage_mean(2, 20, 1, true)); // 13.825
 console.log(advantage_mean(2, 20, 1, false)); // 7.175
 console.log(advantage_mean(4, 6, 3, true)); // 12.2445987654321
+
+export default advantage_mean;
