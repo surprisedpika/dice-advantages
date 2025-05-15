@@ -12,8 +12,8 @@ function product(lists: Part[][]): Part[][] {
   for (let i = 1; i < lists.length; i++) {
     const tmp: Part[][] = [];
     for (const r of res) {
-      for (const el of lists[i]) {
-        tmp.push([...r, el]);
+      for (const element of lists[i]) {
+        tmp.push([...r, element]);
       }
     }
     res = tmp;
@@ -22,7 +22,7 @@ function product(lists: Part[][]): Part[][] {
 }
 
 function psum(exps: Part[][]): Part[] {
-  const tmp: Record<number, number> = {};
+  const temp: Record<number, number> = {};
 
   for (const exp of exps) {
     let count = 0;
@@ -31,15 +31,15 @@ function psum(exps: Part[][]): Part[] {
       count += part.value;
       prob *= part.probability;
     }
-    if (!(count in tmp)) {
-      tmp[count] = 0;
+    if (!(count in temp)) {
+      temp[count] = 0;
     }
-    tmp[count] += prob;
+    temp[count] += prob;
   }
 
   const out: Part[] = [];
   let total = 0;
-  for (const [countStr, prob] of Object.entries(tmp)) {
+  for (const [countStr, prob] of Object.entries(temp)) {
     const count = parseInt(countStr);
     out.push({ value: count, probability: prob });
     total += prob;
@@ -55,37 +55,32 @@ function psum(exps: Part[][]): Part[] {
 function highest(exps: Part[][], N: number): Part[][] {
   const out: Part[][] = [];
   for (const exp of exps) {
-    let tmp: Part[] = [];
+    let temp: Part[] = [];
     for (const part of exp) {
-      if (tmp.length < N) {
-        tmp.push(part);
+      if (temp.length < N) {
+        temp.push(part);
       } else {
-        if (part.value > tmp[0].value) {
-          tmp[0] = part;
+        if (part.value > temp[0].value) {
+          temp[0] = part;
         }
       }
-      tmp.sort((a, b) => a.value - b.value);
+      temp.sort((a, b) => a.value - b.value);
     }
-    out.push(tmp);
+    out.push(temp);
   }
   return out;
 }
 
-function highest_new(exps: Part[][], N: number): Part[][] {
-
-  throw new Error();
-}
-
 function parse(
-  txt: string,
+  text: string,
   sumResult: boolean = false
 ): Part[][] | Part[] {
   let value = 0,
     count = 0,
     die = 0;
-  txt = txt.trim();
+  text = text.trim();
 
-  for (const c of txt) {
+  for (const c of text) {
     if (c >= "0" && c <= "9") {
       value = parseInt(c) + 10 * value;
     } else if (c === "d") {
