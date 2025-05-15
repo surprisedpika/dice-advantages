@@ -30,38 +30,40 @@ function psum(exps: Part[][]): Part[] {
       count += part.value;
       prob *= part.probability;
     }
-    if (!(count in temp)) {
-      temp[count] = 0;
-    }
+    if (!(count in temp)) temp[count] = 0;
     temp[count] += prob;
   }
 
-  const out: Part[] = [];
+  const result: Part[] = [];
   let total = 0;
 
   for (const [count, prob] of Object.entries(temp)) {
-    out.push({ value: Number(count), probability: prob });
+    result.push({ value: Number(count), probability: prob });
     total += prob;
   }
 
-  out.forEach((q) => (q.probability /= total));
-  return out;
+  result.forEach((q) => (q.probability /= total));
+  return result;
 }
 
-function highest(exps: Part[][], N: number): Part[][] {
-  const out: Part[][] = [];
-  for (const exp of exps) {
-    let temp: Part[] = exp.slice(0, N);
+function highest(expressions: Part[][], N: number, advantage: boolean = true): Part[][] {
+  const result: Part[][] = [];
+  for (const expression of expressions) {
+    const temp: Part[] = expression.slice(0, N);
     temp.sort((a, b) => a.value - b.value);
-    for (let i = N; i < exp.length; i++) {
-      if (exp[i].value > temp[0].value) temp[0] = exp[i];
+    for (let i = N; i < expression.length; i++) {
+      if (advantage) {
+        if (expression[i].value > temp[0].value) temp[0] = expression[i];
+      } else {
+        if (expression[i].value < temp[0].value) temp[0] = expression[i];
+      }
     }
-    out.push(temp);
+    result.push(temp);
   }
-  return out;
+  return result;
 }
 
-const xdykhz = (x: number, y: number, z: number) => {
+const advantage_mean = (x: number, y: number, z: number, advantage: boolean = true) => {
   // Generate individual rolls
   const row = Array.from({ length: y }, (_, i) => ({
     probability: 1 / y,
@@ -71,7 +73,7 @@ const xdykhz = (x: number, y: number, z: number) => {
   // Generate all combinations
   const out = product(roll);
   // Generate distribution
-  const dist = psum(highest(out, z));
+  const dist = psum(highest(out, z, advantage));
   // Calculate mean
   return dist.reduce(
     (partialSum, exp) => partialSum + exp.value * exp.probability,
@@ -79,5 +81,6 @@ const xdykhz = (x: number, y: number, z: number) => {
   );
 };
 
-console.log(xdykhz(2, 20, 1)); // 13.825
-console.log(xdykhz(4, 6, 3)); // 12.2445987654321
+console.log(advantage_mean(2, 20, 1)); // 13.825
+console.log(advantage_mean(2, 20, 1, false)); // 7.175
+console.log(advantage_mean(4, 6, 3)); // 12.2445987654321
