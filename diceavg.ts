@@ -3,23 +3,6 @@ interface Part {
   value: number;
 }
 
-function product(lists: Part[][]): Part[][] {
-  if (lists.length === 0) return [];
-  let result: Part[][] = lists[0].map((el) => [el]);
-
-  for (let i = 1; i < lists.length; i++) {
-    const temp: Part[][] = [];
-    for (const res of result) {
-      for (const element of lists[i]) {
-        temp.push([...res, element]);
-      }
-    }
-    result = temp;
-  }
-
-  return result;
-}
-
 function psum(exps: Part[][]): Part[] {
   const temp: Record<number, number> = {};
 
@@ -81,7 +64,10 @@ const advantage_mean = (
   }));
   const roll = Array.from({ length: numDice }, () => [...row]);
   // Generate all combinations
-  const out = product(roll);
+  const out = roll.reduce<Part[][]>(
+    (acc, curr) => acc.flatMap((a) => curr.map((b) => [...a, b])),
+    [[]]
+  );
   // Generate distribution
   const dist = psum(highest(out, numToKeep, advantage));
   // Calculate mean
