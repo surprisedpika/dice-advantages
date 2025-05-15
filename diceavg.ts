@@ -1,7 +1,7 @@
-interface Part { probability: number; value: number };
-
-const dN = (n: number) =>
-  Array.from({ length: n }, (_, i) => ({ probability: 1 / n, value: i + 1 }));
+interface Part {
+  probability: number;
+  value: number;
+}
 
 function product(lists: Part[][]): Part[][] {
   if (lists.length === 0) return [];
@@ -44,7 +44,7 @@ function psum(exps: Part[][]): Part[] {
     total += prob;
   }
 
-  out.forEach((q) => q.probability /= total);
+  out.forEach((q) => (q.probability /= total));
   return out;
 }
 
@@ -55,12 +55,12 @@ function highest(exps: Part[][], N: number): Part[][] {
     for (const part of exp) {
       if (temp.length < N) {
         temp.push(part);
-      } else {
-        if (part.value > temp[0].value) {
-          temp[0] = part;
+        if (temp.length === N) {
+          temp.sort((a, b) => a.value - b.value);
         }
+      } else if (part.value > temp[0].value) {
+        temp[0] = part;
       }
-      temp.sort((a, b) => a.value - b.value);
     }
     out.push(temp);
   }
@@ -69,7 +69,11 @@ function highest(exps: Part[][], N: number): Part[][] {
 
 const xdykhz = (x: number, y: number, z: number) => {
   // Generate individual rolls
-  const roll = Array.from({ length: x >= 1 ? x : 1 }, () => dN(y));
+  const row = Array.from({ length: y }, (_, i) => ({
+    probability: 1 / y,
+    value: i + 1,
+  }));
+  const roll = Array.from({ length: x }, () => [...row]);
   // Generate all combinations
   const out = product(roll);
   // Generate distribution
@@ -80,6 +84,11 @@ const xdykhz = (x: number, y: number, z: number) => {
     0
   );
 };
+
+// 180ms
+console.time();
+for (let i = 0; i < 5_000; i++) xdykhz(2, 20, 1);
+console.timeEnd();
 
 console.log(xdykhz(2, 20, 1)); // 13.825
 console.log(xdykhz(4, 6, 3)); // 12.2445987654321
